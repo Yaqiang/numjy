@@ -195,6 +195,16 @@ public class IndexConstant extends Index {
     public boolean getBooleanNext() { currElement++; return maa.getBoolean(0); }
     public void setBooleanCurrent(boolean val) { maa.setBoolean(currElement, val); }
     public void setBooleanNext(boolean val) {currElement++;  maa.setBoolean(0, val); }
+    
+    public String getStringCurrent() { return maa.getString(currElement); }
+    public String getStringNext() { currElement++; return maa.getString(0); }
+    public void setStringCurrent(String val) { maa.setString(currElement, val); }
+    public void setStringNext(String val) {currElement++;  maa.setString(0, val); }
+    
+    public Complex getComplexCurrent() { return maa.getComplex(currElement); }
+    public Complex getComplexNext() { currElement++; return maa.getComplex(0); }
+    public void setComplexCurrent(Complex val) { maa.setComplex(currElement, val); }
+    public void setComplexNext(Complex val) {currElement++;  maa.setComplex(0, val); }
 
     public Object getObjectCurrent() { return maa.getObject(currElement); }
     public Object getObjectNext() { currElement++; return maa.getObject(0); }

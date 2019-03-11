@@ -52,6 +52,8 @@ public enum DataType {
   LONG("long", 8, long.class),
   FLOAT("float", 4, float.class),
   DOUBLE("double", 8, double.class),
+  
+  COMPLEX("complex", 1, Complex.class),
 
   // object types
   SEQUENCE("Sequence", 4, StructureDataIterator.class), // 32-bit index
@@ -78,7 +80,9 @@ public enum DataType {
 
   /**
    * The DataType name, eg "byte", "float", "String".
+     * @return The DataType name
    */
+  @Override
   public String toString() {
     return niceName;
   }

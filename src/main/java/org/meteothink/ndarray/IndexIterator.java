@@ -227,6 +227,30 @@ public interface IndexIterator {
    * @param val the  current value as a char
    */
   public void setCharCurrent(char val);
+  
+  /**
+   * Get next value as a string
+   * @return next value as a string
+   */
+  public String getStringNext();
+
+  /**
+   * Set next value with a string
+   * @param val the  next value as a string
+   */
+  public void setStringNext(String val);
+
+  /**
+   * Get current value as a string
+   * @return current value as a string
+   */
+  public String getStringCurrent();
+
+  /**
+   * Set current value with a string
+   * @param val the  current value as a string
+   */
+  public void setStringCurrent(String val);
 
   /**
    * Get next value as a boolean
@@ -251,6 +275,30 @@ public interface IndexIterator {
    * @param val the  current value as a boolean
    */
   public void setBooleanCurrent(boolean val);
+  
+  /**
+   * Get next value as a complex
+   * @return next value as a complex
+   */
+  public Complex getComplexNext();
+
+  /**
+   * Set next value with a complex
+   * @param val the  next value as a complex
+   */
+  public void setComplexNext(Complex val);
+  
+  /**
+   * Get current value as a complex
+   * @return Current value as a complex
+   */
+  public Complex getComplexCurrent();
+  
+  /**
+   * Set current value with a complex
+   * @param val The current value as a complex
+   */
+  public void setComplexCurrent(Complex val);
 
   /**
    * Get next value as an Object

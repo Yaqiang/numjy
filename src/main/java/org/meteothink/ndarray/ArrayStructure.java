@@ -1122,6 +1122,34 @@ public abstract class ArrayStructure extends Array {
   public void setBoolean(Index i, boolean value) {
     throw new ForbiddenConversionException();
   }
+  
+  /**
+     * not legal, throw ForbiddenConversionException
+     */
+    public String getString(Index i) {
+        throw new ForbiddenConversionException();
+    }
+
+    /**
+     * not legal, throw ForbiddenConversionException
+     */
+    public void setString(Index i, String value) {
+        throw new ForbiddenConversionException();
+    }
+
+    /**
+     * not legal, throw ForbiddenConversionException
+     */
+    public Complex getComplex(Index i) {
+        throw new ForbiddenConversionException();
+    }
+
+    /**
+     * not legal, throw ForbiddenConversionException
+     */
+    public void setComplex(Index i, Complex value) {
+        throw new ForbiddenConversionException();
+    }
 
   /**
    * DO NOT USE, throw ForbiddenConversionException
@@ -1202,5 +1230,21 @@ public abstract class ArrayStructure extends Array {
   public void setBoolean(int index, boolean value) {
     throw new ForbiddenConversionException();
   }
+  
+  public String getString(int index) {
+        throw new ForbiddenConversionException();
+    }
+
+    public void setString(int index, String value) {
+        throw new ForbiddenConversionException();
+    }
+    
+    public Complex getComplex(int index) {
+        throw new ForbiddenConversionException();
+    }
+
+    public void setComplex(int index, Complex value) {
+        throw new ForbiddenConversionException();
+    }
 
 }
