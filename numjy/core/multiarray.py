@@ -15,7 +15,7 @@ class NDArray(object):
         '''
         if not isinstance(array, Array):
             array = ArrayUtil.array(array)
-        self.array = array
+        self._array = array
         self.ndim = array.getRank()
         s = array.getShape()
         s1 = []
@@ -23,7 +23,7 @@ class NDArray(object):
             s1.append(s[i])
         self._shape = tuple(s1)
         self.dtype = array.getDataType()
-        self.size = int(self.array.getSize())
+        self.size = int(self._array.getSize())
         #self.idx = -1
         self.iterator = array.getIndexIterator()
         if self.ndim > 0:
@@ -44,11 +44,11 @@ class NDArray(object):
                 if i >= 0:
                     l *= i
             idx = nvalue.index(-1)
-            nvalue[idx] = int(self.array.getSize() / l)
+            nvalue[idx] = int(self._array.getSize() / l)
             value = tuple(nvalue)
         self._shape = value
         nshape = jarray.array(value, 'i')
-        self.__init__(self.array.reshape(nshape))
+        self.__init__(self._array.reshape(nshape))
         
     shape = property(get_shape, set_shape)
         
@@ -56,10 +56,10 @@ class NDArray(object):
         return self._shape[0]         
         
     def __str__(self):
-        return ArrayUtil.convertToString(self.array)
+        return ArrayUtil.convertToString(self._array)
         
     def __repr__(self):
-        return ArrayUtil.convertToString(self.array)
+        return ArrayUtil.convertToString(self._array)
     
     def __getitem__(self, indices):
         #print type(indices)            
@@ -69,7 +69,7 @@ class NDArray(object):
             indices = inds
             
         allint = True
-        aindex = self.array.getIndex()
+        aindex = self._array.getIndex()
         i = 0
         for ii in indices:
             if isinstance(ii, int):
@@ -81,7 +81,7 @@ class NDArray(object):
                 break;
             i += 1
         if allint:
-            return self.array.getObject(aindex)
+            return self._array.getObject(aindex)
             
         if self.ndim == 0:
             return self
@@ -151,12 +151,12 @@ class NDArray(object):
             return NDArray(r)
             
         if onlyrange:
-            r = ArrayMath.section(self.array, ranges)
+            r = ArrayMath.section(self._array, ranges)
         else:
             if alllist:
-                r = ArrayMath.takeValues(self.array, ranges)
+                r = ArrayMath.takeValues(self._array, ranges)
             else:
-                r = ArrayMath.take(self.array, ranges)
+                r = ArrayMath.take(self._array, ranges)
         if r.getSize() == 1:
             r = r.getObject(0)
             if isinstance(r, Complex):
@@ -175,7 +175,7 @@ class NDArray(object):
         if isinstance(indices, NDArray):
             if isinstance(value, NDArray):
                 value = value.asarray()
-            ArrayMath.setValue(self.array, indices.array, value)
+            ArrayMath.setValue(self._array, indices.array, value)
             return None
         
         if not isinstance(indices, tuple):
@@ -184,7 +184,7 @@ class NDArray(object):
             indices = inds
         
         if self.ndim == 0:
-            self.array.setObject(0, value)
+            self._array.setObject(0, value)
             return None
         
         if len(indices) != self.ndim:
@@ -231,13 +231,13 @@ class NDArray(object):
         if isinstance(value, NDArray):
             value = value.asarray()
         if onlyrange:
-            r = ArrayMath.setSection(self.array, ranges, value)
+            r = ArrayMath.setSection(self._array, ranges, value)
         else:
             if alllist:
-                r = ArrayMath.setSection_List(self.array, ranges, value)
+                r = ArrayMath.setSection_List(self._array, ranges, value)
             else:
-                r = ArrayMath.setSection_Mix(self.array, ranges, value)
-        self.array = r
+                r = ArrayMath.setSection_Mix(self._array, ranges, value)
+        self._array = r
     
     def __value_other(self, other):
         if not isinstance(other, numbers.Number):
@@ -245,11 +245,11 @@ class NDArray(object):
         return other
     
     def __abs__(self):
-        return NDArray(ArrayMath.abs(self.array))
+        return NDArray(ArrayMath.abs(self._array))
     
     def __add__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.add(self.array, other)        
+        r = ArrayMath.add(self._array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
@@ -259,21 +259,21 @@ class NDArray(object):
         
     def __sub__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.sub(self.array, other)        
+        r = ArrayMath.sub(self._array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
         
     def __rsub__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.sub(other, self.array)        
+        r = ArrayMath.sub(other, self._array)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
     
     def __mul__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.mul(self.array, other)
+        r = ArrayMath.mul(self._array, other)
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
@@ -283,93 +283,93 @@ class NDArray(object):
         
     def __div__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.div(self.array, other)        
+        r = ArrayMath.div(self._array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
         
     def __rdiv__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.div(other, self.array)        
+        r = ArrayMath.div(other, self._array)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
         
     def __pow__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.pow(self.array, other)        
+        r = ArrayMath.pow(self._array, other)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
         
     def __rpow__(self, other):
         other = NDArray.__value_other(self, other)
-        r = ArrayMath.pow(other, self.array)        
+        r = ArrayMath.pow(other, self._array)        
         if r is None:
             raise ValueError('Dimension missmatch, can not broadcast!')
         return NDArray(r)
         
     def __neg__(self):
-        r = NDArray(ArrayMath.sub(0, self.array))
+        r = NDArray(ArrayMath.sub(0, self._array))
         return r
         
     def __lt__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.lessThan(self.array, other))
+        r = NDArray(ArrayMath.lessThan(self._array, other))
         return r
         
     def __le__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.lessThanOrEqual(self.array, other))        
+        r = NDArray(ArrayMath.lessThanOrEqual(self._array, other))        
         return r
         
     def __eq__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.equal(self.array, other))
+        r = NDArray(ArrayMath.equal(self._array, other))
         return r
         
     def __ne__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.notEqual(self.array, other))
+        r = NDArray(ArrayMath.notEqual(self._array, other))
         return r
         
     def __gt__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.greaterThan(self.array, other))
+        r = NDArray(ArrayMath.greaterThan(self._array, other))
         return r
         
     def __ge__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.greaterThanOrEqual(self.array, other))
+        r = NDArray(ArrayMath.greaterThanOrEqual(self._array, other))
         return r
         
     def __and__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.bitAnd(self.array, other))
+        r = NDArray(ArrayMath.bitAnd(self._array, other))
         return r
         
     def __or__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.bitOr(self.array, other))
+        r = NDArray(ArrayMath.bitOr(self._array, other))
         return r
         
     def __xor__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.bitXor(self.array, other))
+        r = NDArray(ArrayMath.bitXor(self._array, other))
         return r
         
     def __invert__(self):
-        r = NDArray(ArrayMath.bitInvert(self.array))
+        r = NDArray(ArrayMath.bitInvert(self._array))
         return r
         
     def __lshift__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.leftShift(self.array, other))
+        r = NDArray(ArrayMath.leftShift(self._array, other))
         return r
         
     def __rshift__(self, other):
         other = NDArray.__value_other(self, other)
-        r = NDArray(ArrayMath.rightShift(self.array, other))
+        r = NDArray(ArrayMath.rightShift(self._array, other))
         return r     
 
     def __iter__(self):
@@ -377,7 +377,7 @@ class NDArray(object):
         provide iteration over the values of the array
         """
         #self.idx = -1
-        self.iterator = self.array.getIndexIterator()
+        self.iterator = self._array.getIndexIterator()
         return self
         
     def next(self):
@@ -388,7 +388,7 @@ class NDArray(object):
         # self.idx += 1
         # if self.idx >= self.size:
             # raise StopIteration()        
-        # return self.array.getObject(self.idx)
+        # return self._array.getObject(self.idx)
         
     def tojarray(self, dtype=None):
         '''
@@ -398,7 +398,7 @@ class NDArray(object):
         
         :returns: (*java array*) Java array.
         '''
-        r = ArrayUtil.copyToNDJavaArray(self.array, dtype)
+        r = ArrayUtil.copyToNDJavaArray(self._array, dtype)
         return r
     
     def in_values(self, other):
@@ -412,7 +412,7 @@ class NDArray(object):
         '''
         if not isinstance(other, (list, tuple)):
             other = other.aslist()
-        r = NDArray(ArrayMath.inValues(self.array, other))
+        r = NDArray(ArrayMath.inValues(self._array, other))
         return r
         
     def contains_nan(self):
@@ -421,7 +421,7 @@ class NDArray(object):
         
         :returns: (*boolean*) True if contains nan, otherwise return False.
         '''
-        return ArrayMath.containsNaN(self.array)
+        return ArrayMath.containsNaN(self._array)
     
     def getsize(self):
         if name == 'size':
@@ -440,11 +440,11 @@ class NDArray(object):
         :returns: (*array*) Converted array.
         '''
         if dtype == 'int' or dtype is int:
-            r = NDArray(ArrayUtil.toInteger(self.array))
+            r = NDArray(ArrayUtil.toInteger(self._array))
         elif dtype == 'float' or dtype is float:
-            r = NDArray(ArrayUtil.toFloat(self.array))
+            r = NDArray(ArrayUtil.toFloat(self._array))
         elif dtype == 'boolean' or dtype == 'bool' or dtype is bool:
-            r = NDArray(ArrayUtil.toBoolean(self.array))
+            r = NDArray(ArrayUtil.toBoolean(self._array))
         else:
             r = self
         return r
@@ -459,10 +459,10 @@ class NDArray(object):
         :returns: Minimum values.
         '''
         if axis is None:
-            r = ArrayMath.min(self.array)
+            r = ArrayMath.min(self._array)
             return r
         else:
-            r = ArrayMath.min(self.array, axis)
+            r = ArrayMath.min(self._array, axis)
             return NDArray(r)
             
     def argmin(self, axis=None):
@@ -476,10 +476,10 @@ class NDArray(object):
             dimension along axis removed.
         '''
         if axis is None:
-            r = ArrayMath.argMin(self.array)
+            r = ArrayMath.argMin(self._array)
             return r
         else:
-            r = ArrayMath.argMin(self.array, axis)
+            r = ArrayMath.argMin(self._array, axis)
             return NDArray(r)
             
     def argmax(self, axis=None):
@@ -493,10 +493,10 @@ class NDArray(object):
             dimension along axis removed.
         '''
         if axis is None:
-            r = ArrayMath.argMax(self.array)
+            r = ArrayMath.argMax(self._array)
             return r
         else:
-            r = ArrayMath.argMax(self.array, axis)
+            r = ArrayMath.argMax(self._array, axis)
             return NDArray(r)
         
     def max(self, axis=None):
@@ -509,10 +509,10 @@ class NDArray(object):
         :returns: Maximum values.
         '''
         if axis is None:
-            r = ArrayMath.max(self.array)
+            r = ArrayMath.max(self._array)
             return r
         else:
-            r = ArrayMath.max(self.array, axis)
+            r = ArrayMath.max(self._array, axis)
             return NDArray(r)
         
     def sum(self, axis=None):
@@ -525,9 +525,9 @@ class NDArray(object):
         returns: (*array_like*) Sum result
         '''
         if axis is None:
-            return ArrayMath.sum(self.array)
+            return ArrayMath.sum(self._array)
         else:
-            r = ArrayMath.sum(self.array, axis)
+            r = ArrayMath.sum(self._array, axis)
             return NDArray(r)
             
     def prod(self):
@@ -536,7 +536,7 @@ class NDArray(object):
         
         :returns: (*float*) Produce value.
         '''
-        return ArrayMath.prodDouble(self.array)
+        return ArrayMath.prodDouble(self._array)
         
     def abs(self):
         '''
@@ -545,13 +545,13 @@ class NDArray(object):
         :returns: An array containing the absolute value of each element in x. 
             For complex input, a + ib, the absolute value is \sqrt{ a^2 + b^2 }.
         '''
-        return NDArray(ArrayMath.abs(self.array))
+        return NDArray(ArrayMath.abs(self._array))
             
     def ave(self, fill_value=None):
         if fill_value == None:
-            return ArrayMath.aveDouble(self.array)
+            return ArrayMath.aveDouble(self._array)
         else:
-            return ArrayMath.aveDouble(self.array, fill_value)
+            return ArrayMath.aveDouble(self._array, fill_value)
             
     def mean(self, axis=None):
         '''
@@ -563,9 +563,9 @@ class NDArray(object):
         returns: (*array_like*) Mean result
         '''
         if axis is None:
-            return ArrayMath.mean(self.array)
+            return ArrayMath.mean(self._array)
         else:
-            return NDArray(ArrayMath.mean(self.array, axis))
+            return NDArray(ArrayMath.mean(self._array, axis))
             
     def median(self, axis=None):
         '''
@@ -577,9 +577,9 @@ class NDArray(object):
         returns: (*array_like*) Median result
         '''
         if axis is None:
-            return ArrayMath.median(self.array)
+            return ArrayMath.median(self._array)
         else:
-            return NDArray(ArrayMath.median(self.array, axis))
+            return NDArray(ArrayMath.median(self._array, axis))
             
     def std(self, axis=None):
         '''
@@ -592,41 +592,41 @@ class NDArray(object):
         returns: (*array_like*) Standart deviation result.
         '''
         if axis is None:
-            r = ArrayMath.std(self.array)
+            r = ArrayMath.std(self._array)
             return r
         else:
-            r = ArrayMath.std(self.array, axis)
+            r = ArrayMath.std(self._array, axis)
             return NDArray(r)
             
     def sqrt(self):
-        return NDArray(ArrayMath.sqrt(self.array))
+        return NDArray(ArrayMath.sqrt(self._array))
     
     def sin(self):
-        return NDArray(ArrayMath.sin(self.array))
+        return NDArray(ArrayMath.sin(self._array))
         
     def cos(self):
-        return NDArray(ArrayMath.cos(self.array))
+        return NDArray(ArrayMath.cos(self._array))
         
     def tan(self):
-        return NDArray(ArrayMath.tan(self.array))
+        return NDArray(ArrayMath.tan(self._array))
         
     def asin(self):
-        return NDArray(ArrayMath.asin(self.array))
+        return NDArray(ArrayMath.asin(self._array))
         
     def acos(self):
-        return NDArray(ArrayMath.acos(self.array))
+        return NDArray(ArrayMath.acos(self._array))
         
     def atan(self):
-        return NDArray(ArrayMath.atan(self.array))
+        return NDArray(ArrayMath.atan(self._array))
         
     def exp(self):
-        return NDArray(ArrayMath.exp(self.array))
+        return NDArray(ArrayMath.exp(self._array))
         
     def log(self):
-        return NDArray(ArrayMath.log(self.array))
+        return NDArray(ArrayMath.log(self._array))
         
     def log10(self):
-        return NDArray(ArrayMath.log10(self.array))
+        return NDArray(ArrayMath.log10(self._array))
         
     def sign(self):
         '''
@@ -634,7 +634,7 @@ class NDArray(object):
 
         The sign function returns -1 if x < 0, 0 if x==0, 1 if x > 0. nan is returned for nan inputs.
         '''
-        return NDArray(ArrayMath.sign(self.array))
+        return NDArray(ArrayMath.sign(self._array))
         
     def dot(self, other):
         """
@@ -646,18 +646,18 @@ class NDArray(object):
         """  
         if isinstance(other, list):
             other = array(other)
-        r = ArrayMath.dot(self.array, other.array)
+        r = ArrayMath.dot(self._array, other.array)
         return NDArray(r)
             
     def aslist(self):
-        r = ArrayMath.asList(self.array)
+        r = ArrayMath.asList(self._array)
         return list(r)
         
     def tolist(self):
         '''
         Convert to a list
         '''
-        r = ArrayMath.asList(self.array)
+        r = ArrayMath.asList(self._array)
         return list(r)
         
     def index(self, v):
@@ -671,7 +671,7 @@ class NDArray(object):
         return self.tolist().index(v)
         
     def asarray(self):
-        return self.array
+        return self._array
         
     def reshape(self, *args):
         if len(args) == 1:
@@ -683,7 +683,7 @@ class NDArray(object):
             for arg in args:
                 shape.append(arg)
         shape = jarray.array(shape, 'i')
-        return NDArray(self.array.reshape(shape))
+        return NDArray(self._array.reshape(shape))
         
     def transpose(self):
         '''
@@ -706,7 +706,7 @@ class NDArray(object):
         
         :returns: Inverse matrix array.
         '''
-        r = LinalgUtil.inv(self.array)
+        r = LinalgUtil.inv(self._array)
         return NDArray(r)
         
     I = property(inv)
@@ -717,7 +717,7 @@ class NDArray(object):
         
         :returns: (*NDArray*) A copy of the input array, flattened to one dimension.
         '''
-        r = self.reshape(int(self.array.getSize()))
+        r = self.reshape(int(self._array.getSize()))
         return r
         
     def repeat(self, repeats, axis=None):
@@ -734,9 +734,9 @@ class NDArray(object):
         if isinstance(repeats, int):
             repeats = [repeats]
         if axis is None:
-            r = ArrayUtil.repeat(self.array, repeats)
+            r = ArrayUtil.repeat(self._array, repeats)
         else:
-            r = ArrayUtil.repeat(self.array, repeats, axis)
+            r = ArrayUtil.repeat(self._array, repeats, axis)
         return NDArray(r)
         
     def take(self, indices):
@@ -748,11 +748,11 @@ class NDArray(object):
         :returns: (*array*) The returned array has the same type as a.
         '''
         ilist = [indices]
-        r = ArrayMath.take(self.array, ilist)
+        r = ArrayMath.take(self._array, ilist)
         return NDArray(r)    
         
     def join(self, b, dimidx):
-        r = ArrayMath.join(self.array, b.array, dimidx)
+        r = ArrayMath.join(self._array, b.array, dimidx)
         return NDArray(r)
  
 #############################################################################

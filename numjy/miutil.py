@@ -1,5 +1,5 @@
 from org.meteothink.util import DateUtil
-from org.meteothink.math import Complex
+from org.meteothink.ndarray import Complex
 from java.util import Calendar, Locale
 from java.text import SimpleDateFormat
 from java.awt import Color
