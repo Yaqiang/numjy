@@ -34,6 +34,7 @@ package org.meteothink.ndarray;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Date;
 
 /**
  * Type-safe enumeration of data types.
@@ -51,6 +52,7 @@ public enum DataType {
     FLOAT("float", 4, float.class),
     DOUBLE("double", 8, double.class),
     COMPLEX("complex", 1, Complex.class),
+    DATE("date", 1, Date.class),
     
     // object types
     SEQUENCE("Sequence", 4, StructureDataIterator.class), // 32-bit index
