@@ -6,3 +6,8 @@ if not jarpath in sys.path:
     sys.path.append(jarpath)
 
 from .core import *
+import fitting
+import interpolate
+import linalg
+import random
+import stats

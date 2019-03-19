@@ -2856,7 +2856,7 @@ public class ArrayMath {
     public static Array bitAnd(Array a, Number b) {
         Array r = Array.factory(a.getDataType(), a.getShape());
         for (int i = 0; i < a.getSize(); i++) {
-            r.setObject(i, a.getInt(i) & b.intValue());
+            r.setInt(i, a.getInt(i) & b.intValue());
         }
 
         return r;
@@ -2872,7 +2872,7 @@ public class ArrayMath {
     public static Array bitAnd(Array a, Array b) {
         Array r = Array.factory(a.getDataType(), a.getShape());
         for (int i = 0; i < a.getSize(); i++) {
-            r.setObject(i, a.getInt(i) & b.getInt(i));
+            r.setInt(i, a.getInt(i) & b.getInt(i));
         }
 
         return r;
@@ -2888,7 +2888,7 @@ public class ArrayMath {
     public static Array bitOr(Array a, Number b) {
         Array r = Array.factory(a.getDataType(), a.getShape());
         for (int i = 0; i < a.getSize(); i++) {
-            r.setObject(i, a.getInt(i) | b.intValue());
+            r.setInt(i, a.getInt(i) | b.intValue());
         }
 
         return r;
@@ -2904,7 +2904,7 @@ public class ArrayMath {
     public static Array bitOr(Array a, Array b) {
         Array r = Array.factory(a.getDataType(), a.getShape());
         for (int i = 0; i < a.getSize(); i++) {
-            r.setObject(i, a.getInt(i) | b.getInt(i));
+            r.setInt(i, a.getInt(i) | b.getInt(i));
         }
 
         return r;
@@ -5519,6 +5519,11 @@ public class ArrayMath {
             case BOOLEAN:
                 while (iterA.hasNext()) {
                     r.add(iterA.getBooleanNext());
+                }
+                break;
+            case STRING:
+                while (iterA.hasNext()) {
+                    r.add(iterA.getStringNext());
                 }
                 break;
             case OBJECT:

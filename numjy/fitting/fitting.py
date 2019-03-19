@@ -1,6 +1,6 @@
 
 from org.meteothink.math.fitting import FittingUtil
-from org.meteothink.ndarray import ArrayMath, ArrayUtil
+from org.meteothink.math import ArrayMath, ArrayUtil
 
 from numjy.core.multiarray import NDArray
 

@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from org.meteothink.math.stats import StatsUtil
 from org.meteothink.math import ArrayMath, ArrayUtil
 from org.meteothink.ndarray import Array

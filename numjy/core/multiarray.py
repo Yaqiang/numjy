@@ -175,7 +175,7 @@ class NDArray(object):
         if isinstance(indices, NDArray):
             if isinstance(value, NDArray):
                 value = value.asarray()
-            ArrayMath.setValue(self._array, indices.array, value)
+            ArrayMath.setValue(self._array, indices._array, value)
             return None
         
         if not isinstance(indices, tuple):
@@ -646,7 +646,7 @@ class NDArray(object):
         """  
         if isinstance(other, list):
             other = array(other)
-        r = ArrayMath.dot(self._array, other.array)
+        r = ArrayMath.dot(self._array, other._array)
         return NDArray(r)
             
     def aslist(self):
@@ -752,7 +752,7 @@ class NDArray(object):
         return NDArray(r)    
         
     def join(self, b, dimidx):
-        r = ArrayMath.join(self._array, b.array, dimidx)
+        r = ArrayMath.join(self._array, b._array, dimidx)
         return NDArray(r)
  
 #############################################################################
