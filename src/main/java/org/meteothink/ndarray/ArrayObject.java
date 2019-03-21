@@ -159,8 +159,13 @@ public class ArrayObject extends Array {
 
     /**
      * Return the element class type
+     * @return Element type
      */
+    @Override
     public Class getElementType() {
+        if (elementType == null) {
+            return this.storage[0].getClass();
+        }
         return elementType;
     }
 

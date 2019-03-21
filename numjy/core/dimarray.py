@@ -2,8 +2,6 @@
 from org.meteothink.common.projection import KnownCoordinateSystems, ProjUtil
 from org.meteothink.math import ArrayMath, ArrayUtil
 from org.meteothink.ndarray import Array, Range, MAMath, DataType, Dimension, DimensionType
-from org.meteothink.geoprocess import GeoComputation
-from org.meteothink.geoprocess.analysis import ResampleMethods
 from org.meteothink.common import PointD
 from multiarray import NDArray
 import math
@@ -806,16 +804,8 @@ class DimArray(NDArray):
         :returns: (*DimArray*) Maskouted data.
         '''
         if isinstance(mask, NDArray):
-            r = GeoComputation.maskout(self.asarray(), mask.asarray())
+            r = ArrayMath.maskout(self.asarray(), mask.asarray())
             return DimArray(NDArray(r), self.dims, self.fill_value, self.proj)
-        else:
-            x = self.dims[1].getDimValue()
-            y = self.dims[0].getDimValue()
-            if not isinstance(mask, (list, ArrayList)):
-                mask = [mask]
-            r = GeoComputation.maskout(self.asarray(), x, y, mask)
-            r = DimArray(NDArray(r), self.dims, self.fill_value, self.proj)
-            return r
             
     def maskin(self, mask):
         '''
@@ -828,14 +818,6 @@ class DimArray(NDArray):
         if isinstance(mask, NDArray):
             r = ArrayMath.maskin(self.asarray(), mask.asarray())
             return DimArray(r, self.dims, self.fill_value, self.proj)
-        else:
-            x = self.dimvalue(1)
-            y = self.dimvalue(0)
-            if not isinstance(mask, (list, ArrayList)):
-                mask = [mask]
-            r = ArrayMath.maskin(self._array, x._array, y._array, mask)
-            r = DimArray(r, self.dims, self.fill_value, self.proj)
-            return r
         
     def transpose(self):
         '''
@@ -997,62 +979,7 @@ class DimArray(NDArray):
             return NDArray(r)
         else:
             return r
-     
-    def tostation(self, x, y):
-        gdata = self.asgriddata()
-        if isinstance(x, NDArray) or isinstance(x, DimArray):
-            r = gdata.data.toStation(x.aslist(), y.aslist())
-            return NDArray(ArrayUtil.array(r))
-        else:
-            return gdata.data.toStation(x, y)
-            
-    def project(self, x=None, y=None, toproj=None, method='bilinear'):
-        """
-        Project array
-        
-        :param x: To x coordinates.
-        :param y: To y coordinates.
-        :param toproj: To projection.
-        :param method: Interpolation method: ``bilinear`` or ``neareast`` .
-        
-        :returns: (*NDArray*) Projected array
-        """
-        yy = self.dims[self.ndim - 2].getDimValue()
-        xx = self.dims[self.ndim - 1].getDimValue()
-        if toproj is None:
-            toproj = self.proj
-        
-        if x is None or y is None:
-            pr = ArrayUtil.reproject(self._array, xx, yy, self.proj, toproj)
-            r = pr[0]
-            x = pr[1]
-            y = pr[2]
-            dims = self.dims
-            ydim = Dimension(DimensionType.Y)
-            ydim.setDimValues(NDArray(y).aslist())
-            dims[-2] = ydim
-            xdim = Dimension(DimensionType.X)
-            xdim.setDimValues(NDArray(x).aslist())    
-            dims[-1] = xdim
-            rr = DimArray(NDArray(r), dims, self.fill_value, toproj)
-            return rr
-        
-        if method == 'bilinear':
-            method = ResampleMethods.Bilinear
-        else:
-            method = ResampleMethods.NearestNeighbor
-        if isinstance(x, list):
-            r = ArrayUtil.reproject(self._array, xx, yy, x, y, self.proj, toproj, self.fill_value, method)
-        elif isinstance(x, NDArray):
-            if x.ndim == 1:
-                r = ArrayUtil.reproject(self._array, xx, yy, x.aslist(), y.aslist(), self.proj, toproj, self.fill_value, method)
-            else:
-                r = ArrayUtil.reproject(self._array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
-        else:
-            r = ArrayUtil.reproject(self._array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
-        #r = ArrayUtil.reproject(self._array, xx, yy, x.asarray(), y.asarray(), self.proj, toproj, self.fill_value, method)
-        return NDArray(r)
-            
+
     def join(self, b, dimidx):
         r = ArrayMath.join(self._array, b._array, dimidx)
         dima = self.dimvalue(dimidx)
