@@ -97,13 +97,19 @@ public class ArrayUtil {
         if (!readFirstCol) {
             sCol = 1;
         }
+        
+        if (delimiter == null || delimiter.equals(" "))
+            delimiter = "\\s+";
+        else
+            delimiter = Pattern.quote(delimiter);
+        
         while (line != null) {
             line = line.trim();
             if (line.isEmpty()) {
                 line = sr.readLine();
                 continue;
             }
-            dataArray = line.split(Pattern.quote(delimiter));
+            dataArray = line.split(delimiter);
             for (int j = sCol; j < dataArray.length; j++) {
                 a.setDouble(i, Double.parseDouble(dataArray[j]));
                 i += 1;
