@@ -151,7 +151,8 @@ class NDArray(object):
             return NDArray(r)
             
         if onlyrange:
-            r = ArrayMath.section(self._array, ranges)
+            #r = ArrayMath.section(self._array, ranges)
+            r = self._array.section(ranges)
         else:
             if alllist:
                 r = ArrayMath.takeValues(self._array, ranges)
@@ -166,9 +167,10 @@ class NDArray(object):
         else:
             for i in flips:
                 r = r.flip(i)
-            rr = Array.factory(r.getDataType(), r.getShape());
-            MAMath.copy(rr, r);
-            return NDArray(rr)
+            return NDArray(r)
+            #rr = Array.factory(r.getDataType(), r.getShape());
+            #MAMath.copy(rr, r);
+            #return NDArray(rr)
         
     def __setitem__(self, indices, value):
         #print type(indices) 
@@ -389,6 +391,12 @@ class NDArray(object):
         # if self.idx >= self.size:
             # raise StopIteration()        
         # return self._array.getObject(self.idx)
+        
+    def copy(self):
+        '''
+        Copy array vlaues to a new array.
+        '''
+        return NDArray(self._array.copy())
         
     def tojarray(self, dtype=None):
         '''

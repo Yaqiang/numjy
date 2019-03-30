@@ -521,7 +521,7 @@ public class Index implements Cloneable {
         return new IteratorFast(size, maa);
     }
 
-    boolean isFastIterator() {
+    public boolean isFastIterator() {
         return fastIterator;
     }
 

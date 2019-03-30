@@ -113,7 +113,7 @@ public class IndexConstant extends Index {
   // not the size of the Array.
   // Fixes bug in https://github.com/Unidata/thredds/issues/581
   @Override
-  boolean isFastIterator() {
+  public boolean isFastIterator() {
     return false;
   }
 

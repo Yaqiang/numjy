@@ -97,12 +97,13 @@ public class ArrayUtil {
         if (!readFirstCol) {
             sCol = 1;
         }
-        
-        if (delimiter == null || delimiter.equals(" "))
+
+        if (delimiter == null || delimiter.equals(" ")) {
             delimiter = "\\s+";
-        else
+        } else {
             delimiter = Pattern.quote(delimiter);
-        
+        }
+
         while (line != null) {
             line = line.trim();
             if (line.isEmpty()) {
@@ -160,6 +161,11 @@ public class ArrayUtil {
      */
     public static int numASCIICol(String fileName, String delimiter, int headerLines) throws FileNotFoundException, IOException {
         String[] dataArray;
+        if (delimiter == null){
+            delimiter = "\\s+";
+        } else {
+            delimiter = Pattern.quote(delimiter);
+        }
         try (BufferedReader sr = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {
             if (headerLines > 0) {
                 for (int i = 0; i < headerLines; i++) {
@@ -167,7 +173,7 @@ public class ArrayUtil {
                 }
             }
             String line = sr.readLine().trim();
-            dataArray = line.split(Pattern.quote(delimiter));
+            dataArray = line.split(delimiter);
         }
 
         return dataArray.length;
@@ -388,7 +394,6 @@ public class ArrayUtil {
 
     // </editor-fold>
     // <editor-fold desc="Create">
- 
     /**
      * Create an array
      *
@@ -536,22 +541,46 @@ public class ArrayUtil {
             start,
             stop,
             step});
-        double startv = start.doubleValue();
-        double stopv = stop.doubleValue();
-        double stepv = step.doubleValue();
-        final int length = Math.max(0, (int) Math.ceil((stopv
-                - startv) / stepv));
-        Array a = Array.factory(dataType, new int[]{length});
-        if (dataType == DataType.FLOAT || dataType == DataType.DOUBLE) {
-            for (int i = 0; i < length; i++) {
-                a.setObject(i, BigDecimalUtil.add(BigDecimalUtil.mul(i, stepv), startv));
-            }
-        } else {
-            for (int i = 0; i < length; i++) {
-                a.setObject(i, i * stepv + startv);
-            }
+        switch (dataType) {
+            case INT:
+                int startvi = start.intValue();
+                int stopvi = stop.intValue();
+                int stepvi = step.intValue();
+                int length = Math.max(0, (int) Math.ceil((stopvi
+                        - startvi) / stepvi));
+                Array a = Array.factory(dataType, new int[]{length});
+                for (int i = 0; i < length; i++) {                    
+                    a.setObject(i, startvi);
+                    startvi += stepvi;
+                }
+                return a;
+            case FLOAT:
+                float startvf = start.floatValue();
+                float stopvf = stop.floatValue();
+                float stepvf = step.floatValue();
+                length = Math.max(0, (int) Math.ceil((stopvf
+                        - startvf) / stepvf));
+                a = Array.factory(dataType, new int[]{length});
+                for (int i = 0; i < length; i++) {                    
+                    a.setObject(i, startvf);
+                    startvf += stepvf;
+                }
+                return a;
+            case DOUBLE:
+                double startvd = start.doubleValue();
+                double stopvd = stop.doubleValue();
+                double stepvd = step.doubleValue();
+                length = Math.max(0, (int) Math.ceil((stopvd
+                        - startvd) / stepvd));
+                a = Array.factory(dataType, new int[]{length});
+                for (int i = 0; i < length; i++) {                    
+                    a.setObject(i, startvd);
+                    startvd += stepvd;
+                }
+                return a;
         }
-        return a;
+        
+        return null;
     }
 
     /**
@@ -889,13 +918,18 @@ public class ArrayUtil {
      */
     public static Array repeat(Array a, List<Integer> repeats) {
         Array r;
+        IndexIterator iterA = a.getIndexIterator();
+        Object o;
         if (repeats.size() == 1) {
             int n = repeats.get(0);
             r = Array.factory(a.getDataType(), new int[]{(int) a.getSize() * n});
-            for (int i = 0; i < a.getSize(); i++) {
+            int i = 0;
+            while(iterA.hasNext()) {
                 for (int j = 0; j < n; j++) {
-                    r.setObject(i * n + j, a.getObject(i));
+                    o = iterA.getObjectNext();
+                    r.setObject(i * n + j, o);
                 }
+                i += 1;
             }
         } else {
             int n = 0;
@@ -904,11 +938,14 @@ public class ArrayUtil {
             }
             r = Array.factory(a.getDataType(), new int[]{n});
             int idx = 0;
-            for (int i = 0; i < a.getSize(); i++) {
+            int i = 0;
+            while(iterA.hasNext()) {
+                o = iterA.getObjectNext();
                 for (int j = 0; j < repeats.get(i); j++) {
-                    r.setObject(idx, a.getObject(i));
+                    r.setObject(idx, o);
                     idx += 1;
                 }
+                i += 1;
             }
         }
 
@@ -1115,6 +1152,7 @@ public class ArrayUtil {
             new_sz = ArrayMath.typeToNBytes(_type);
             if (new_sz > sz) {
                 dataType = _type;
+                sz = new_sz;
             }
         }
         return dataType;
@@ -1334,18 +1372,20 @@ public class ArrayUtil {
      */
     public static Array toInteger(Array a) {
         Array r = Array.factory(DataType.INT, a.getShape());
+        IndexIterator iterA = a.getIndexIterator();
+        IndexIterator iterR = r.getIndexIterator();
         if (a.getDataType().isNumeric()) {
-            for (int i = 0; i < r.getSize(); i++) {
-                r.setInt(i, a.getInt(i));
+            while (iterA.hasNext()) {
+                iterR.setIntNext(iterA.getIntNext());
             }
         } else {
             if (a.getDataType() == DataType.BOOLEAN) {
-                for (int i = 0; i < r.getSize(); i++) {
-                    r.setInt(i, a.getBoolean(i) ? 1 : 0);
+                while(iterA.hasNext()) {
+                    iterR.setIntNext(iterA.getBooleanNext() ? 1 : 0);
                 }
             } else {
-                for (int i = 0; i < r.getSize(); i++) {
-                    r.setInt(i, Integer.valueOf(a.getObject(i).toString()));
+                while(iterA.hasNext()) {
+                    iterR.setIntNext(Integer.valueOf(iterA.getObjectNext().toString()));
                 }
             }
         }
@@ -1361,13 +1401,15 @@ public class ArrayUtil {
      */
     public static Array toFloat(Array a) {
         Array r = Array.factory(DataType.FLOAT, a.getShape());
+        IndexIterator iterA = a.getIndexIterator();
+        IndexIterator iterR = r.getIndexIterator();
         if (a.getDataType().isNumeric()) {
-            for (int i = 0; i < r.getSize(); i++) {
-                r.setFloat(i, a.getFloat(i));
+            while(iterA.hasNext()) {
+                iterR.setFloatNext(iterA.getFloatNext());
             }
         } else {
-            for (int i = 0; i < r.getSize(); i++) {
-                r.setFloat(i, Float.valueOf(a.getObject(i).toString()));
+            while(iterA.hasNext()) {
+                iterR.setFloatNext(Float.valueOf(iterA.getObjectNext().toString()));
             }
         }
 
@@ -1382,13 +1424,15 @@ public class ArrayUtil {
      */
     public static Array toDouble(Array a) {
         Array r = Array.factory(DataType.DOUBLE, a.getShape());
+        IndexIterator iterA = a.getIndexIterator();
+        IndexIterator iterR = r.getIndexIterator();
         if (a.getDataType().isNumeric()) {
-            for (int i = 0; i < r.getSize(); i++) {
-                r.setDouble(i, a.getDouble(i));
+            while(iterA.hasNext()) {
+                iterR.setDoubleNext(iterA.getDoubleNext());
             }
         } else {
-            for (int i = 0; i < r.getSize(); i++) {
-                r.setDouble(i, Double.valueOf(a.getObject(i).toString()));
+            while(iterA.hasNext()) {
+                iterR.setDoubleNext(Double.valueOf(iterA.getObjectNext().toString()));
             }
         }
 
@@ -1403,9 +1447,10 @@ public class ArrayUtil {
      */
     public static Array toBoolean(Array a) {
         Array r = Array.factory(DataType.BOOLEAN, a.getShape());
-        //Array r = new ArrayBoolean(a.getShape());
-        for (int i = 0; i < r.getSize(); i++) {
-            r.setBoolean(i, a.getDouble(i) != 0);
+        IndexIterator iterA = a.getIndexIterator();
+        IndexIterator iterR = r.getIndexIterator();
+        while(iterA.hasNext()) {
+            iterR.setBooleanNext(iterA.getDoubleNext() != 0);
         }
 
         return r;
@@ -1417,7 +1462,7 @@ public class ArrayUtil {
      * @param arrays Array list
      * @param axis The axis
      * @return Concatenated array
-     * @throws ucar.ma2.InvalidRangeException
+     * @throws org.meteothink.ndarray.InvalidRangeException
      */
     public static Array concatenate(List<Array> arrays, Integer axis) throws InvalidRangeException {
         int ndim = arrays.get(0).getRank();
@@ -1468,7 +1513,7 @@ public class ArrayUtil {
      * @param b Array b
      * @param axis The axis
      * @return Concatenated array
-     * @throws ucar.ma2.InvalidRangeException
+     * @throws org.meteothink.ndarray.InvalidRangeException
      */
     public static Array concatenate(Array a, Array b, Integer axis) throws InvalidRangeException {
         int n = a.getRank();
@@ -1537,7 +1582,7 @@ public class ArrayUtil {
             if (axis == -1) {
                 axis = n - 1;
             }
-            int nn = shape[axis];            
+            int nn = shape[axis];
             Array r = Array.factory(a.getDataType(), shape);
             Index indexr = r.getIndex();
             int[] current;
@@ -1550,14 +1595,14 @@ public class ArrayUtil {
                 }
             }
             IndexIterator rii = r.sectionNoReduce(ranges).getIndexIterator();
-            while(rii.hasNext()) {
+            while (rii.hasNext()) {
                 rii.next();
                 current = rii.getCurrentCounter();
                 ranges = new ArrayList<>();
                 for (int j = 0; j < n; j++) {
                     if (j == axis) {
                         ranges.add(new Range(0, shape[j] - 1, 1));
-                    } else {                        
+                    } else {
                         ranges.add(new Range(current[j], current[j], 1));
                     }
                 }
@@ -1573,11 +1618,11 @@ public class ArrayUtil {
                     current[axis] = current[axis] + 1;
                 }
             }
-            
+
             return r;
         }
     }
-    
+
     /**
      * Get sorted array index along an axis
      *
@@ -1657,8 +1702,8 @@ public class ArrayUtil {
             return r;
         }
     }
-    
-     /**
+
+    /**
      * Convert array to N-Dimension double Java array
      *
      * @param a Array a
@@ -1669,7 +1714,7 @@ public class ArrayUtil {
         if (dtype == null) {
             return copyToNDJavaArray(a);
         }
-        
+
         switch (dtype.toLowerCase()) {
             case "double":
                 return copyToNDJavaArray_Double(a);
@@ -1717,7 +1762,7 @@ public class ArrayUtil {
 
         return javaArray;
     }
-    
+
     /**
      * Convert array to N-Dimension double Java array
      *
@@ -1766,29 +1811,31 @@ public class ArrayUtil {
             ja[i] = iter.getLongNext();
         }
     }
-    
+
     /**
      * Return a new array with sub-arrays along an axis deleted
+     *
      * @param a Input array
      * @param idx Index
      * @param axis The axis
-     * @return 
+     * @return
      */
     public static Array delete(Array a, int idx, int axis) {
         int[] shape = a.getShape();
-        int n  = shape.length;
+        int n = shape.length;
         int[] nshape = new int[n];
-        for (int i = 0; i < n; i++){
-            if (i == axis)
+        for (int i = 0; i < n; i++) {
+            if (i == axis) {
                 nshape[i] = shape[i] - 1;
-            else
+            } else {
                 nshape[i] = shape[i];
+            }
         }
         Array r = Array.factory(a.getDataType(), nshape);
         IndexIterator ii = a.getIndexIterator();
         int[] current;
         int i = 0;
-        while(ii.hasNext()) {
+        while (ii.hasNext()) {
             ii.next();
             current = ii.getCurrentCounter();
             if (current[axis] != idx) {
@@ -1796,32 +1843,34 @@ public class ArrayUtil {
                 i += 1;
             }
         }
-        
+
         return r;
     }
-    
+
     /**
      * Return a new array with sub-arrays along an axis deleted
+     *
      * @param a Input array
      * @param idx Index
      * @param axis The axis
-     * @return 
+     * @return
      */
     public static Array delete(Array a, List<Integer> idx, int axis) {
         int[] shape = a.getShape();
-        int n  = shape.length;
+        int n = shape.length;
         int[] nshape = new int[n];
-        for (int i = 0; i < n; i++){
-            if (i == axis)
+        for (int i = 0; i < n; i++) {
+            if (i == axis) {
                 nshape[i] = shape[i] - idx.size();
-            else
+            } else {
                 nshape[i] = shape[i];
+            }
         }
         Array r = Array.factory(a.getDataType(), nshape);
         IndexIterator ii = a.getIndexIterator();
         int[] current;
         int i = 0;
-        while(ii.hasNext()) {
+        while (ii.hasNext()) {
             ii.next();
             current = ii.getCurrentCounter();
             if (!idx.contains(current[axis])) {
@@ -1829,7 +1878,7 @@ public class ArrayUtil {
                 i += 1;
             }
         }
-        
+
         return r;
     }
 
@@ -1861,8 +1910,9 @@ public class ArrayUtil {
         int n = (int) bins.getSize();
         Array hist = Array.factory(DataType.INT, new int[]{n - 1});
         double v;
-        for (int i = 0; i < a.getSize(); i++) {
-            v = a.getDouble(i);
+        IndexIterator iterA = a.getIndexIterator();
+        while(iterA.hasNext()) {
+            v = iterA.getDoubleNext();
             for (int j = 0; j < n - 1; j++) {
                 if (j == n - 2) {
                     if (v >= bins.getDouble(j) && v <= bins.getDouble(j + 1)) {
@@ -1895,8 +1945,9 @@ public class ArrayUtil {
         double delta = bins[1] - bins[0];
         int[] count = new int[n + 1];
         double v;
-        for (int i = 0; i < a.getSize(); i++) {
-            v = a.getDouble(i);
+        IndexIterator iterA = a.getIndexIterator();
+        while(iterA.hasNext()) {
+            v = iterA.getDoubleNext();
             if (v < bins[0]) {
                 count[0] += 1;
             } else if (v > bins[n - 1]) {
@@ -2019,11 +2070,16 @@ public class ArrayUtil {
         int yn = (int) y.getSize();
         int[] shape = new int[]{yn, xn};
         Array rx = Array.factory(x.getDataType(), shape);
-        Array ry = Array.factory(y.getDataType(), shape);
+        Array ry = Array.factory(y.getDataType(), shape);        
+        IndexIterator iterY = y.getIndexIterator();
+        Object xv, yv;
         for (int i = 0; i < yn; i++) {
+            yv = iterY.getObjectNext();
+            IndexIterator iterX = x.getIndexIterator();
             for (int j = 0; j < xn; j++) {
-                rx.setObject(i * xn + j, x.getObject(j));
-                ry.setObject(i * xn + j, y.getObject(i));
+                xv = iterX.getObjectNext();
+                rx.setObject(i * xn + j, xv);
+                ry.setObject(i * xn + j, yv);
             }
         }
 
@@ -2053,9 +2109,10 @@ public class ArrayUtil {
             x = xs[s];
             r = Array.factory(xs[s].getDataType(), shape);
             Index index = r.getIndex();
+            Index xIndex = x.getIndex();
             for (i = 0; i < r.getSize(); i++) {
                 idx = index.getCurrentCounter()[n - s - 1];
-                r.setObject(index, x.getObject(idx));
+                r.setObject(index, x.getObject(xIndex.set0(idx)));
                 index.incr();
             }
             rs[s] = r;
@@ -2076,6 +2133,9 @@ public class ArrayUtil {
     public static Array smooth5(Array a, int rowNum, int colNum, double unDefData) {
         Array r = Array.factory(a.getDataType(), a.getShape());
         double s = 0.5;
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         if (Double.isNaN(unDefData)) {
             for (int i = 0; i < rowNum; i++) {
                 for (int j = 0; j < colNum; j++) {
@@ -2124,6 +2184,9 @@ public class ArrayUtil {
         int colNum = shape[1];
         int rowNum = shape[0];
         Array r = Array.factory(a.getDataType(), shape);
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         Index2D index = new Index2D(shape);
         double v, w;
         double sum, wsum;
@@ -2132,23 +2195,26 @@ public class ArrayUtil {
                 sum = 0;
                 wsum = 0;
                 for (int ii = i - 1; ii <= i + 1; ii++) {
-                    if (ii < 0 || ii >= rowNum)
+                    if (ii < 0 || ii >= rowNum) {
                         continue;
+                    }
                     for (int jj = j - 1; jj <= j + 1; jj++) {
-                        if (jj < 0 || jj >= colNum)
+                        if (jj < 0 || jj >= colNum) {
                             continue;
+                        }
                         if ((ii == i - 1 || ii == i + 1) && jj != j) {
                             continue;
                         }
                         v = a.getDouble(index.set(ii, jj));
                         if (!Double.isNaN(v)) {
-                            if (ii == i && jj == j)
+                            if (ii == i && jj == j) {
                                 w = 1;
-                            else
+                            } else {
                                 w = 0.5;
+                            }
                             sum += v * w;
                             wsum += w;
-                        }                        
+                        }
                     }
                 }
                 index.set(i, j);
@@ -2162,7 +2228,7 @@ public class ArrayUtil {
 
         return r;
     }
-    
+
     /**
      * Smooth with 9 points
      *
@@ -2174,6 +2240,9 @@ public class ArrayUtil {
         int colNum = shape[1];
         int rowNum = shape[0];
         Array r = Array.factory(a.getDataType(), shape);
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         Index2D index = new Index2D(shape);
         double v, w;
         double sum, wsum;
@@ -2182,20 +2251,23 @@ public class ArrayUtil {
                 sum = 0;
                 wsum = 0;
                 for (int ii = i - 1; ii <= i + 1; ii++) {
-                    if (ii < 0 || ii >= rowNum)
+                    if (ii < 0 || ii >= rowNum) {
                         continue;
+                    }
                     for (int jj = j - 1; jj <= j + 1; jj++) {
-                        if (jj < 0 || jj >= colNum)
+                        if (jj < 0 || jj >= colNum) {
                             continue;
+                        }
                         v = a.getDouble(index.set(ii, jj));
                         if (!Double.isNaN(v)) {
-                            if (ii == i && jj == j)
+                            if (ii == i && jj == j) {
                                 w = 1;
-                            else {
-                                if (ii == i || jj == j)
+                            } else {
+                                if (ii == i || jj == j) {
                                     w = 0.5;
-                                else
+                                } else {
                                     w = 0.3;
+                                }
                             }
                             sum += v * w;
                             wsum += w;
@@ -2238,6 +2310,9 @@ public class ArrayUtil {
         double w, SV, SW;
         boolean ifPointGrid;
         double x, y, v;
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
 
         //---- Do interpolation
         for (i = 0; i < rowNum; i++) {
@@ -2312,6 +2387,9 @@ public class ArrayUtil {
         double[][] NW = new double[2][points];
         int NWIdx;
         double x, y, v;
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
 
         //---- Do interpolation with IDW method
         for (i = 0; i < rowNum; i++) {
@@ -2411,6 +2489,9 @@ public class ArrayUtil {
 
         List<int[]> pIJ = getPointsIJ(x_s, y_s, X, Y);
 
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         for (int i = 0; i < rowNum; i++) {
             gy = Y.get(i).doubleValue();
             for (int j = 0; j < colNum; j++) {
@@ -2459,6 +2540,9 @@ public class ArrayUtil {
         double gx, gy;
         double x, y, r, v, minr;
 
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         for (int i = 0; i < rowNum; i++) {
             gy = Y.get(i).doubleValue();
             for (int j = 0; j < colNum; j++) {
@@ -2500,6 +2584,12 @@ public class ArrayUtil {
      * @return Result x and y coordinates
      */
     public static Array[] extendHalfCell(Array x, Array y) {
+        if (!x.getIndexPrivate().isFastIterator()) {
+            x = x.copy();
+        }
+        if (!y.getIndexPrivate().isFastIterator()) {
+            y = y.copy();
+        }
         double dX = x.getDouble(1) - x.getDouble(0);
         double dY = y.getDouble(1) - y.getDouble(0);
         int nx = (int) x.getSize() + 1;
@@ -2547,6 +2637,9 @@ public class ArrayUtil {
         int[][] pNums = new int[rowNum][colNum];
         double x, y, v;
 
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         for (int i = 0; i < rowNum; i++) {
             for (int j = 0; j < colNum; j++) {
                 pNums[i][j] = 0;
@@ -2602,6 +2695,9 @@ public class ArrayUtil {
      */
     public static Array interpolation_Inside(Array x_s, Array y_s, Array a, Array X, Array Y, boolean center) {
         int rowNum, colNum, pNum;
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
 
         if (center) {
             Array[] xy = extendHalfCell(X, Y);
@@ -2686,6 +2782,9 @@ public class ArrayUtil {
         double x, y, v;
         double min = Double.NEGATIVE_INFINITY;
 
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         for (int i = 0; i < rowNum; i++) {
             for (int j = 0; j < colNum; j++) {
                 pNums[i][j] = 0;
@@ -2748,6 +2847,9 @@ public class ArrayUtil {
         double x, y, v;
         double max = Double.MAX_VALUE;
 
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         for (int i = 0; i < rowNum; i++) {
             for (int j = 0; j < colNum; j++) {
                 pNums[i][j] = 0;
@@ -3361,6 +3463,9 @@ public class ArrayUtil {
         double x, y, v;
         Array r = Array.factory(DataType.DOUBLE, new int[]{yn, xn});
 
+        if (!a.getIndexPrivate().isFastIterator()) {
+            a = a.copy();
+        }
         for (i = 0; i < yn; i++) {
             y = newY.get(i).doubleValue();
             for (j = 0; j < xn; j++) {

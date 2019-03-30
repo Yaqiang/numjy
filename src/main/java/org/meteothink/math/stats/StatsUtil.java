@@ -178,7 +178,7 @@ public class StatsUtil {
      * @param y Y data
      * @param axis Special axis for calculation
      * @return Pearson correlation and p-value.
-     * @throws ucar.ma2.InvalidRangeException
+     * @throws InvalidRangeException
      */
     public static Array[] pearsonr(Array x, Array y, int axis) throws InvalidRangeException {
         int[] dataShape = x.getShape();
@@ -235,12 +235,16 @@ public class StatsUtil {
         if (x.getRank() == 2)
             n = x.getShape()[1];
         double[][] aa = new double[m][n * 2];
+        Index indexX = x.getIndex();
+        Index indexY = y.getIndex();
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n * 2; j++) {
                 if (j < n) {
-                    aa[i][j] = x.getDouble(i * n + j);
+                    indexX.setCurrentCounter(i * n + j);
+                    aa[i][j] = x.getDouble(indexX);
                 } else {
-                    aa[i][j] = y.getDouble(i * n + j - n);
+                    indexY.setCurrentCounter(i * n + j - n);
+                    aa[i][j] = y.getDouble(indexY);
                 }
             }
         }

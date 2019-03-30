@@ -255,7 +255,7 @@ public class ArrayDouble extends Array {
      * not legal, throw ForbiddenConversionException
      */
     public Complex getComplex(Index i) {
-        throw new ForbiddenConversionException();
+        return new Complex(getDouble(i), 0);
     }
 
     /**
@@ -347,7 +347,7 @@ public class ArrayDouble extends Array {
     }
 
     public Complex getComplex(int index) {
-        throw new ForbiddenConversionException();
+        return new Complex(getDouble(index), 0);
     }
 
     public void setComplex(int index, Complex value) {

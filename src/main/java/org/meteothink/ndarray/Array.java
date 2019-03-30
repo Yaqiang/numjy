@@ -443,8 +443,7 @@ public abstract class Array {
     /**
      * Compute the datatype sort
      */
-    DataType
-            computesort() {
+    DataType computesort() {
         if (this instanceof ArrayBoolean) {
             return DataType.BOOLEAN;
         }
@@ -471,6 +470,9 @@ public abstract class Array {
         }
         if (this instanceof ArrayString) {
             return DataType.STRING;
+        }
+        if (this instanceof ArrayComplex) {
+            return DataType.COMPLEX;
         }
         if (this instanceof ArrayObject) {
             return DataType.OBJECT;

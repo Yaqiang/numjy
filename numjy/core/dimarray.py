@@ -54,7 +54,7 @@ class DimArray(NDArray):
             print 'indices must be ' + str(self.ndim) + ' dimensions!'
             raise IndexError()
             
-        if not self.proj is None and not self.proj.isLonLat():
+        if not self.proj is None and not self.proj.getProjection().getName() == 'longlat':
             xlim = None
             ylim = None
             xidx = -1
@@ -1004,7 +1004,7 @@ class DimArray(NDArray):
             else:
                 rdims.append(self.dims[i])
         return DimArray(NDArray(r), rdims, self.fill_value, self.proj)
-        
+            
     def savegrid(self, fname, format='surfer', **kwargs):
         '''
         Save the array data to an ASCII or binary file. The array must be 2 dimension.
