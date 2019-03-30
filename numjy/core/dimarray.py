@@ -449,6 +449,12 @@ class DimArray(NDArray):
         array = NDArray(rr)
         data = DimArray(array, dims, self.fill_value, self.proj)
         return data
+        
+    def copy(self):
+        '''
+        Copy array vlaues to a new array.
+        '''
+        return DimArray(self._array.copy(), self.dims, self.fill_value, self.proj)
     
     # get dimension length
     def dimlen(self, idx=0):
