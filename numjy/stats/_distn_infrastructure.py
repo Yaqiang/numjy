@@ -178,3 +178,5 @@ class rv_continuous(object):
         '''
         dist = self._create_distribution(*args)
         return dist.getNumericalVariance()
+        
+#######################################################

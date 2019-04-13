@@ -1,11 +1,14 @@
 # coding=utf-8
 
 from org.meteothink.math import RandomUtil
+from org.meteothink.math.distribution import DistributionUtil
+from org.apache.commons.math3.distribution import NormalDistribution, BetaDistribution,
+    ChiSquaredDistribution, ExponentialDistribution
 
 from numjy.core.multiarray import NDArray
 
 __all__ = [
-    'rand','randn','randint','poisson','seed'
+    'chisquare','exponential','normal','rand','randn','randint','poisson','seed'
     ]
 
 def seed(seed=None):
@@ -103,3 +106,46 @@ def poisson(lam=1.0, size=None):
     else:
         r = NDArray(RandomUtil.poisson(lam, size))
     return r
+    
+def normal(loc=0.0, scale=1.0, size=None):
+    """
+    Draw random samples from a normal (Gaussian) distribution.
+    
+    :param loc: (*float*) Mean (“centre”) of the distribution.
+    :param scale: (*float*) Standard deviation (spread or “width”) of the distribution.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    """
+    dist = NormalDistribution(loc, scale)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)
+    
+def chisquare(df, size=None):
+    """
+    Draw samples from a chi-square distribution.
+    
+    :param df: (*float*) Number of degrees of freedom, should be > 0.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    """
+    dist = ChiSquaredDistribution(df)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)
+    
+def exponential(scale=1.0, size=None):
+    """
+    Draw samples from a exponential distribution.
+    
+    :param scale: (*float*) The scale parameter.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    """
+    dist = ExponentialDistribution(scale)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)

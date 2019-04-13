@@ -5,6 +5,7 @@
  */
 package org.meteothink.math.distribution;
 
+import java.util.List;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.meteothink.ndarray.Array;
@@ -24,6 +25,26 @@ public class DistributionUtil {
     public static Array rvs(RealDistribution dis, int n){
         double[] samples = dis.sample(n);
         Array r = Array.factory(DataType.DOUBLE, new int[]{n}, samples);        
+        return r;
+    }
+    
+    /**
+     * Random variates of given type.
+     * @param dis Distribution.
+     * @param shape Size shape.
+     * @return Rsult array.
+     */
+    public static Array rvs(RealDistribution dis, List<Integer> shape){
+        int n = 1;
+        for (int s : shape) {
+            n = n * s;
+        }
+        double[] samples = dis.sample(n);
+        int[] ashape = new int[shape.size()];
+        for (int i = 0; i < shape.size(); i++) {
+            ashape[i] = shape.get(i);
+        }
+        Array r = Array.factory(DataType.DOUBLE, ashape, samples);
         return r;
     }
     
