@@ -2,7 +2,7 @@
 
 from org.meteothink.math import RandomUtil
 from org.meteothink.math.distribution import DistributionUtil
-from org.apache.commons.math3.distribution import NormalDistribution, BetaDistribution,
+from org.apache.commons.math3.distribution import NormalDistribution, BetaDistribution, \
     ChiSquaredDistribution, ExponentialDistribution
 
 from numjy.core.multiarray import NDArray
