@@ -3,12 +3,14 @@
 from org.meteothink.math import RandomUtil
 from org.meteothink.math.distribution import DistributionUtil
 from org.apache.commons.math3.distribution import NormalDistribution, BetaDistribution, \
-    ChiSquaredDistribution, ExponentialDistribution
+    BinomialDistribution, ChiSquaredDistribution, ExponentialDistribution, FDistribution, \
+    GammaDistribution, GumbelDistribution
 
 from numjy.core.multiarray import NDArray
 
 __all__ = [
-    'chisquare','exponential','normal','rand','randn','randint','poisson','seed'
+    'beta','binomial','chisquare','exponential','f','gamma','gumbel','normal',
+    'rand','randn','randint','poisson','seed'
     ]
 
 def seed(seed=None):
@@ -106,6 +108,38 @@ def poisson(lam=1.0, size=None):
     else:
         r = NDArray(RandomUtil.poisson(lam, size))
     return r
+
+def beta(loc=0.0, scale=1.0, size=None):
+    """
+    Draw random samples from a Beta distribution.
+    
+    :param loc: (*float*) Mean (“centre”) of the distribution.
+    :param scale: (*float*) Standard deviation (spread or “width”) of the distribution.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized beta distribution.
+    """
+    dist = BetaDistribution(loc, scale)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)
+    
+def binomial(n, p, size=None):
+    """
+    Draw random samples from a binomial distribution.
+    
+    :param n: (*int*) Parameter trials of the distribution, >= 0.
+    :param p: (*float*) Parameter probalility of success of the distribution, >= 0 and <=1.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized binomial distribution.
+    """
+    dist = BinomialDistribution(n, p)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)
     
 def normal(loc=0.0, scale=1.0, size=None):
     """
@@ -115,6 +149,7 @@ def normal(loc=0.0, scale=1.0, size=None):
     :param scale: (*float*) Standard deviation (spread or “width”) of the distribution.
     :param size: (*int*) Output shape. If size is None (default), a single value is returned.
     
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized normal distribution.    
     """
     dist = NormalDistribution(loc, scale)
     if size is None:
@@ -129,6 +164,7 @@ def chisquare(df, size=None):
     :param df: (*float*) Number of degrees of freedom, should be > 0.
     :param size: (*int*) Output shape. If size is None (default), a single value is returned.
     
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized chisquare distribution.    
     """
     dist = ChiSquaredDistribution(df)
     if size is None:
@@ -143,8 +179,57 @@ def exponential(scale=1.0, size=None):
     :param scale: (*float*) The scale parameter.
     :param size: (*int*) Output shape. If size is None (default), a single value is returned.
     
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized exponential distribution.    
     """
     dist = ExponentialDistribution(scale)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)
+    
+def f(dfnum, dfden, size=None):
+    """
+    Draw random samples from a F distribution.
+    
+    :param dfnum: (*float*) Degrees of freedom in numerator, should be > 0.
+    :param dfden: (*float*) Degrees of freedom in denominator, should be > 0.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized Fisher distribution.    
+    """
+    dist = FDistribution(dfnum, dfden)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)
+    
+def gamma(shape, scale=1.0, size=None):
+    """
+    Draw random samples from a Gamma distribution.
+    
+    :param shape: (*float*) The shape of the gamma distribution. Should be greater than zero.
+    :param scale: (*float*) Standard deviation (spread or “width”) of the distribution.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized Gamma distribution.    
+    """
+    dist = GammaDistribution(shape, scale)
+    if size is None:
+        size = 1
+    r = DistributionUtil.rvs(dist, size)
+    return NDArray(r)
+    
+def gumbel(loc=0.0, scale=1.0, size=None):
+    """
+    Draw random samples from a Gumbel distribution.
+    
+    :param loc: (*float*) Mean (“centre”) of the distribution.
+    :param scale: (*float*) Standard deviation (spread or “width”) of the distribution.
+    :param size: (*int*) Output shape. If size is None (default), a single value is returned.
+    
+    :returns: (*ndarray or scalar*) Drawn samples from the parameterized Gumbel distribution.    
+    """
+    dist = GumbelDistribution(loc, scale)
     if size is None:
         size = 1
     r = DistributionUtil.rvs(dist, size)
