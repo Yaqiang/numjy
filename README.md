@@ -1,7 +1,7 @@
 # numjy
 Numeric package for Jython
 
-Build NumJy with maven and copy numpy folder into Lib -> site-packages folder of Jython. Run Jython and import numjy:
+Build NumJy with maven and copy numjy folder into Lib -> site-packages folder of Jython. Run Jython and import numjy:
 
 ```python
 >>> import numjy as np
