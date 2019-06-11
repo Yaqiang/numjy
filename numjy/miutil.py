@@ -36,8 +36,8 @@ def pydate(t):
         return r
     else:
         if isinstance(t, DateTime):
-            dt = datetime.datetime(tt.getYear(), tt.getMonthOfYear(), tt.getDayOfMonth(), \
-                tt.getHourOfDay(), tt.getMinuteOfHour(), tt.getSecondOfMinute(), tt.getMillisOfSecond())
+            dt = datetime.datetime(t.getYear(), t.getMonthOfYear(), t.getDayOfMonth(), \
+                t.getHourOfDay(), t.getMinuteOfHour(), t.getSecondOfMinute(), t.getMillisOfSecond())
             return dt
         else:
             cal = Calendar.getInstance()

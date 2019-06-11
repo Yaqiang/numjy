@@ -6,7 +6,7 @@ from org.meteothink.math.stats import StatsUtil
 from numjy.core.multiarray import NDArray
 
 __all__ = [
-    'solve','cholesky','lu','qr', 'svd','eig','inv','lstsq'
+    'solve','cholesky','det','lu','qr', 'svd','eig','inv','lstsq'
     ]
 
 def solve(a, b):
@@ -217,3 +217,19 @@ def lstsq(a, b):
     '''
     r = StatsUtil.multipleLineRegress_OLS(b.asarray(), a.asarray(), True)
     return NDArray(r[0]), NDArray(r[1])
+    
+def det(a):
+    '''
+    Compute the determinant of an array.
+    
+    arameters
+    ----------
+    a : (..., M, M) array_like
+        Input array to compute determinants for.
+    Returns
+    -------
+    det : (...) array_like
+        Determinant of `a`.
+    '''
+    r = LinalgUtil.determinantOfMatrix(a.asarray())
+    return r 

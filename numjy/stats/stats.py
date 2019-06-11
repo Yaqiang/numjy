@@ -5,7 +5,7 @@ from org.meteothink.math import ArrayMath, ArrayUtil
 from org.meteothink.ndarray import Array
 
 from numjy.core.multiarray import NDArray
-import numjy.core.numeric as minum
+import numjy.core.numeric as np
 
 __all__ = [
     'chi2_contingency','chisquare','covariance','cov','pearsonr','spearmanr','kendalltau',
@@ -310,7 +310,7 @@ def chisquare(f_obs, f_exp=None):
         f_obs = NDArray(ArrayUtil.array(f_obs))
     if f_exp is None:
         n = len(f_obs)
-        f_exp = minum.ones(n) / n * f_obs.sum()
+        f_exp = np.ones(n) / n * f_obs.sum()
     elif isinstance(f_exp, list):
         f_exp = NDArray(ArrayUtil.array(f_exp))
     r = StatsUtil.chiSquareTest(f_exp.asarray(), f_obs.asarray())

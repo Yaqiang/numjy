@@ -29,7 +29,13 @@ class DimArray(NDArray):
         self.proj = proj
         
     def __getitem__(self, indices):
-        #print type(indices)
+        if isinstance(indices, slice):
+            k = indices
+            if k.start is None and k.stop is None and k.step is None:
+                r = Array.factory(self.array.getDataType(), self.array.getShape())
+                MAMath.copy(r, self.array)
+                return DimArray(r, self.dims, self.fill_value, self.proj) 
+                
         if not isinstance(indices, tuple):
             inds = []
             inds.append(indices)
@@ -228,8 +234,8 @@ class DimArray(NDArray):
         else:
             for i in flips:
                 r = r.flip(i)
-            #rr = Array.factory(r.getDataType(), r.getShape());
-            #MAMath.copy(rr, r);
+            #rr = Array.factory(r.getDataType(), r.getShape())
+            #MAMath.copy(rr, r)
             array = NDArray(r)
             data = DimArray(array, ndims, self.fill_value, self.proj)
             return data        
@@ -1010,7 +1016,50 @@ class DimArray(NDArray):
             else:
                 rdims.append(self.dims[i])
         return DimArray(NDArray(r), rdims, self.fill_value, self.proj)
-            
+        
+    def project(self, x=None, y=None, toproj=None, method='bilinear'):
+        """
+        Project array
+        
+        :param x: To x coordinates.
+        :param y: To y coordinates.
+        :param toproj: To projection.
+        :param method: Interpolation method: ``bilinear`` or ``neareast`` .
+        
+        :returns: (*NDArray*) Projected array
+        """
+        yy = self.dims[self.ndim - 2].getDimValue()
+        xx = self.dims[self.ndim - 1].getDimValue()
+        if toproj is None:
+            toproj = self.proj
+        
+        if x is None or y is None:
+            pr = ArrayUtil.reproject(self.array, xx, yy, self.proj, toproj)
+            r = pr[0]
+            x = pr[1]
+            y = pr[2]
+            dims = self.dims
+            ydim = Dimension(DimensionType.Y)
+            ydim.setDimValues(NDArray(y).aslist())
+            dims[-2] = ydim
+            xdim = Dimension(DimensionType.X)
+            xdim.setDimValues(NDArray(x).aslist())    
+            dims[-1] = xdim
+            rr = DimArray(NDArray(r), dims, self.fill_value, toproj)
+            return rr
+        
+        if method == 'bilinear':
+            method = ResampleMethods.Bilinear
+        else:
+            method = ResampleMethods.NearestNeighbor
+        if isinstance(x, (list, tuple)):
+            x = NDArray(x)
+        if isinstance(y, (list, tuple)):
+            y = NDArray(y)
+        x, y = ArrayUtil.meshgrid(x.asarray(), y.asarray())
+        r = ArrayUtil.reproject(self.array, xx, yy, x, y, self.proj, toproj, method)
+        return NDArray(r)
+                
     def savegrid(self, fname, format='surfer', **kwargs):
         '''
         Save the array data to an ASCII or binary file. The array must be 2 dimension.
