@@ -168,6 +168,29 @@ public class Dimension {
     public List<Double> getDimValue() {
         return _dimValue;
     }
+    
+    /**
+     * Get dimension value array
+     * @return dimension value array
+     */
+    public Array getDimArray() {
+        int n = this.getLength();
+        Array r = Array.factory(DataType.DOUBLE, new int[]{n});
+        for (int i = 0; i < n; i++) {
+            r.setDouble(i, _dimValue.get(i));
+        }
+        
+        return r;
+    }
+    
+    /**
+     * Get dimension value by index
+     * @param idx index
+     * @return Dimension value
+     */
+    public double getDimValue(int idx) {
+        return this._dimValue.get(idx);
+    }
 
     /**
      * Get dimension identifer
@@ -369,6 +392,15 @@ public class Dimension {
         }
 
         return BigDecimalUtil.sub(_dimValue.get(1), _dimValue.get(0));
+    }
+    
+    /**
+     * Extract dimension
+     * @param range The range
+     * @return Result dimension
+     */
+    public Dimension extract(Range range) {
+        return this.extract(range.first(), range.last(), range.stride());
     }
 
     /**

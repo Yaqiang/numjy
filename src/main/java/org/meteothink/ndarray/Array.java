@@ -1016,6 +1016,20 @@ public abstract class Array {
         }
         return result;
     }
+    
+    /**
+     * Reshape this array - the new shape total size may be different.
+     * 
+     * @param shape the new shape
+     * @return the new Array
+     */
+    public Array reshapeVLen(int[] shape) {
+        Array result = factory(this.getElementType(), shape);
+        long len = Math.min(this.getSize(), result.getSize());
+        result.setUnsigned(isUnsigned());
+        Array.arraycopy(this, 0, result, 0, (int) len);
+        return result;
+    }
 
     /**
      * Create a new Array using same backing store as this Array, by eliminating

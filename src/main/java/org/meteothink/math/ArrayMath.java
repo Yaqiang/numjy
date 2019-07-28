@@ -848,7 +848,7 @@ public class ArrayMath {
                     IndexIterator iterA = a.getIndexIterator();
                     IndexIterator iterB = b.getIndexIterator();
                     IndexIterator iterR = r.getIndexIterator();
-                    while (iterA.hasNext()) {                        
+                    while (iterA.hasNext()) {
                         iterR.setFloatNext(iterA.getFloatNext() - iterB.getFloatNext());
                     }
                 }
@@ -888,7 +888,7 @@ public class ArrayMath {
         } else {
             IndexIterator iterA = a.getIndexIterator();
             IndexIterator iterR = r.getIndexIterator();
-            while(iterA.hasNext()) {
+            while (iterA.hasNext()) {
                 iterR.setFloatNext(iterA.getFloatNext() - b);
             }
         }
@@ -905,7 +905,7 @@ public class ArrayMath {
         } else {
             IndexIterator iterA = a.getIndexIterator();
             IndexIterator iterR = r.getIndexIterator();
-            while(iterA.hasNext()) {
+            while (iterA.hasNext()) {
                 iterR.setFloatNext(b - iterA.getFloatNext());
             }
         }
@@ -930,7 +930,7 @@ public class ArrayMath {
                     IndexIterator iterA = a.getIndexIterator();
                     IndexIterator iterB = b.getIndexIterator();
                     IndexIterator iterR = r.getIndexIterator();
-                    while(iterA.hasNext()) {
+                    while (iterA.hasNext()) {
                         iterR.setDoubleNext(iterA.getDoubleNext() - iterB.getDoubleNext());
                     }
                 }
@@ -970,7 +970,7 @@ public class ArrayMath {
         } else {
             IndexIterator iterA = a.getIndexIterator();
             IndexIterator iterR = r.getIndexIterator();
-            while(iterA.hasNext()) {
+            while (iterA.hasNext()) {
                 iterR.setDoubleNext(iterA.getDoubleNext() - b);
             }
         }
@@ -987,7 +987,7 @@ public class ArrayMath {
         } else {
             IndexIterator iterA = a.getIndexIterator();
             IndexIterator iterR = r.getIndexIterator();
-            while(iterA.hasNext()) {
+            while (iterA.hasNext()) {
                 iterR.setDoubleNext(b - iterA.getDoubleNext());
             }
         }
@@ -2671,6 +2671,30 @@ public class ArrayMath {
                 while (iterA.hasNext()) {
                     iterR.setBooleanNext(iterA.getDoubleNext() == v);
                 }
+            }
+        }
+
+        return r;
+    }
+
+    /**
+     * Array equal
+     *
+     * @param a Array a
+     * @param b Number b
+     * @return Result array
+     */
+    public static Array equal(Array a, String b) {
+        Array r = Array.factory(DataType.BOOLEAN, a.getShape());
+        if (a.getIndexPrivate().isFastIterator()) {
+            for (int i = 0; i < a.getSize(); i++) {
+                r.setBoolean(i, a.getString(i).equals(b));
+            }
+        } else {
+            IndexIterator iterA = a.getIndexIterator();
+            IndexIterator iterR = r.getIndexIterator();
+            while (iterA.hasNext()) {
+                iterR.setBooleanNext(iterA.getStringNext().equals(b));
             }
         }
 
@@ -5209,7 +5233,7 @@ public class ArrayMath {
         }
         return sum;
     }
-    
+
     /**
      * Return the cumulative sum of the elements along a given axis.
      *
@@ -5261,10 +5285,10 @@ public class ArrayMath {
         }
         r = null;
 
-         return rr;
+        return rr;
     }
 
-     /**
+    /**
      * Compute cumulative sum value of an array
      *
      * @param a Array a
@@ -5279,10 +5303,10 @@ public class ArrayMath {
         while (ii.hasNext()) {
             v = ii.getDoubleNext();
             s += v;
-            r.add(s);             
+            r.add(s);
         }
 
-         return r;
+        return r;
     }
 
     /**

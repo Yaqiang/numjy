@@ -10,6 +10,7 @@ from org.meteothink.math.interpolate import InterpUtil
 
 from dimarray import DimArray
 from multiarray import NDArray
+import numjy.miutil as miutil
 
 from java.lang import Math, Double, Float
 from java.util import Calendar
@@ -63,6 +64,9 @@ def array(object):
     """
     if isinstance(object, NDArray):
         return object
+    if isinstance(object, (list, tuple)):
+        if isinstance(object[0], datetime.datetime):
+            object = miutil.dates2nums(object)
     return NDArray(ArrayUtil.array(object))
     
 def dim_array(a, dims=None):
@@ -932,7 +936,7 @@ def cumsum(x, axis=None):
         x = x.flatten()
         axis = 0
 
-     r = ArrayMath.cumsum(x.asarray(), axis)
+    r = ArrayMath.cumsum(x.asarray(), axis)
     if type(x) is MIArray:
         return NDArray(r)
     else:
@@ -1257,7 +1261,7 @@ def diff(a, axis=-1):
     if axis < 0:
         axis = nd + axis
 
-     slice1 = [slice(None)] * nd
+    slice1 = [slice(None)] * nd
     slice2 = [slice(None)] * nd
     slice1[axis] = slice(1, None)
     slice2[axis] = slice(None, -1)
@@ -1338,7 +1342,7 @@ def histogram(a, bins=10, density=False):
     h = NDArray(r[0])
     b = NDArray(r[1])
 
-     if density:
+    if density:
         db = diff(b).astype('float')
         return h / db / h.sum(), b
     else:
